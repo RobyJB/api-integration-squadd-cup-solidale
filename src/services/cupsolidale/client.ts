@@ -1,8 +1,15 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { config } from '../../config/env';
 import { logger, SyncLogger } from '../../utils/logger';
 import { CupSolidaleError } from '../../utils/errors';
 import { withRetry, CircuitBreaker } from '../../utils/retry';
+
+// Extend axios config to include metadata
+declare module 'axios' {
+  interface InternalAxiosRequestConfig {
+    metadata?: { startTime: number };
+  }
+}
 import {
   CupSolidaleConfig,
   CupApiResponse,
@@ -331,7 +338,7 @@ export class CupSolidaleClient {
 
     for (const chunk of chunks) {
       const chunkRequest = { ...request, availabilities: chunk };
-      const result = await this.makeRequest('POST', '/disponibilita/add', chunkRequest);
+      const result = await this.makeRequest<string>('POST', '/disponibilita/add', chunkRequest);
       results.push(result);
     }
 
@@ -345,7 +352,7 @@ export class CupSolidaleClient {
 
     for (const chunk of chunks) {
       const chunkRequest = { ...request, availabilities: chunk };
-      const result = await this.makeRequest('POST', '/disponibilita/remove_days', chunkRequest);
+      const result = await this.makeRequest<string>('POST', '/disponibilita/remove_days', chunkRequest);
       results.push(result);
     }
 
@@ -360,7 +367,7 @@ export class CupSolidaleClient {
 
     for (const chunk of chunks) {
       const chunkRequest = { ...request, blocks: chunk };
-      const result = await this.makeRequest('POST', '/indisponibilita/add', chunkRequest);
+      const result = await this.makeRequest<string>('POST', '/indisponibilita/add', chunkRequest);
       results.push(result);
     }
 

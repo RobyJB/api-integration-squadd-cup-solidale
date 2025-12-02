@@ -388,8 +388,8 @@ export class DatabaseService {
 
   async updateQueueItem(id: string, updates: Partial<SyncQueueItem>): Promise<void> {
     const client = await this.getClient();
-    const setClause = [];
-    const values = [];
+    const setClause: string[] = [];
+    const values: unknown[] = [];
     let paramIndex = 1;
 
     Object.entries(updates).forEach(([key, value]) => {

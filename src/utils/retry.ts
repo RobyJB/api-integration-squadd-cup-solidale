@@ -23,7 +23,7 @@ export async function withRetry<T>(
   context?: string
 ): Promise<T> {
   const opts = { ...defaultRetryOptions, ...options };
-  let lastError: Error;
+  let lastError: Error = new Error('Retry failed');
 
   for (let attempt = 0; attempt <= opts.maxRetries; attempt++) {
     try {

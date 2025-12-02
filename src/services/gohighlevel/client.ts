@@ -3,10 +3,16 @@ import { config } from '../../config/env';
 import { logger, SyncLogger } from '../../utils/logger';
 import { GoHighLevelError } from '../../utils/errors';
 import { withRetry, CircuitBreaker } from '../../utils/retry';
+
+// Extend axios config to include metadata
+declare module 'axios' {
+  interface InternalAxiosRequestConfig {
+    metadata?: { startTime: number };
+  }
+}
+
 import {
   GoHighLevelConfig,
-  GHLApiResponse,
-  GHLCalendarEvent,
   GHLCreateEventRequest,
   GHLUpdateEventRequest,
   GHLEventResponse,
@@ -14,8 +20,7 @@ import {
   GHLContact,
   GHLCreateContactRequest,
   GHLCalendar,
-  GHLUser,
-  GHLErrorResponse
+  GHLUser
 } from './types';
 
 export class GoHighLevelClient {
@@ -358,7 +363,7 @@ export class GoHighLevelClient {
 
   private shouldUpdateContact(existing: GHLContact, newData: GHLCreateContactRequest): boolean {
     // Check if any field has changed
-    return (
+    return Boolean(
       (newData.firstName && existing.firstName !== newData.firstName) ||
       (newData.lastName && existing.lastName !== newData.lastName) ||
       (newData.phone && existing.phone !== newData.phone) ||
